@@ -15,15 +15,15 @@ const GenerateQuizInputSchema = z.object({
 });
 export type GenerateQuizInput = z.infer<typeof GenerateQuizInputSchema>;
 
+const QuizQuestionSchema = z.object({
+  question: z.string().describe('The quiz question.'),
+  options: z.array(z.string()).describe('The possible answers.'),
+  answer: z.string().describe('The correct answer.'),
+  correctAnswerExplanation: z.string().describe('Explanation of why the answer is correct.'),
+});
+
 const GenerateQuizOutputSchema = z.object({
-  quiz: z.array(
-    z.object({
-      question: z.string().describe('The quiz question.'),
-      options: z.array(z.string()).describe('The possible answers.'),
-      answer: z.string().describe('The correct answer.'),
-      correctAnswerExplanation: z.string().describe('Explanation of why the answer is correct.'),
-    })
-  ).describe('The generated quiz questions and answers.'),
+  quiz: z.array(QuizQuestionSchema).length(6).describe('The generated quiz questions and answers.'),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
@@ -40,17 +40,10 @@ const generateQuizPrompt = ai.definePrompt({
   },
   output: {
     schema: z.object({
-      quiz: z.array(
-        z.object({
-          question: z.string().describe('The quiz question.'),
-          options: z.array(z.string()).describe('The possible answers.'),
-          answer: z.string().describe('The correct answer.'),
-          correctAnswerExplanation: z.string().describe('Explanation of why the answer is correct.'),
-        })
-      ).describe('The generated quiz questions and answers.'),
+      quiz: z.array(QuizQuestionSchema).length(6).describe('The generated quiz questions and answers.'),
     }),
   },
-  prompt: `You are a quiz generator. Generate a quiz based on the following text. The quiz should have multiple choice questions. Each question should have 4 options, one of which is the correct answer. For each question, provide a brief explanation of why the correct answer is correct in the correctAnswerExplanation field. Return the quiz as a JSON object.
+  prompt: `You are a quiz generator. Generate a quiz based on the following text. The quiz should have multiple choice questions. Each question should have 4 options, one of which is the correct answer. For each question, provide a brief explanation of why the correct answer is correct in the correctAnswerExplanation field. Return exactly 6 questions in the quiz as a JSON object.
 
 Text: {{{text}}}`,
 });
