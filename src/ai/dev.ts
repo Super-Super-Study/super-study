@@ -1,1 +1,2 @@
-// Flows will be imported for their side effects in this file.
+import '@/ai/flows/summarize-input-text.ts';
+import '@/ai/flows/generate-quiz-from-text.ts';
