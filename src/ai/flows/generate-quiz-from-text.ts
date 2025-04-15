@@ -1,4 +1,3 @@
-// src/ai/flows/generate-quiz-from-text.ts
 'use server';
 /**
  * @fileOverview Generates a quiz from input text using the Gemini API.
@@ -22,6 +21,7 @@ const GenerateQuizOutputSchema = z.object({
       question: z.string().describe('The quiz question.'),
       options: z.array(z.string()).describe('The possible answers.'),
       answer: z.string().describe('The correct answer.'),
+      correctAnswerExplanation: z.string().describe('Explanation of why the answer is correct.'),
     })
   ).describe('The generated quiz questions and answers.'),
 });
@@ -45,11 +45,12 @@ const generateQuizPrompt = ai.definePrompt({
           question: z.string().describe('The quiz question.'),
           options: z.array(z.string()).describe('The possible answers.'),
           answer: z.string().describe('The correct answer.'),
+          correctAnswerExplanation: z.string().describe('Explanation of why the answer is correct.'),
         })
       ).describe('The generated quiz questions and answers.'),
     }),
   },
-  prompt: `You are a quiz generator. Generate a quiz based on the following text. The quiz should have multiple choice questions. Each question should have 4 options, one of which is the correct answer. Return the quiz as a JSON object.
+  prompt: `You are a quiz generator. Generate a quiz based on the following text. The quiz should have multiple choice questions. Each question should have 4 options, one of which is the correct answer. For each question, provide a brief explanation of why the correct answer is correct in the correctAnswerExplanation field. Return the quiz as a JSON object.
 
 Text: {{{text}}}`,
 });

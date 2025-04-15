@@ -1,12 +1,13 @@
 'use client';
 
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
 import {generateQuiz} from '@/ai/flows/generate-quiz-from-text';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Check, X} from 'lucide-react';
 import {cn} from '@/lib/utils';
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 
 export default function Home() {
   const [inputText, setInputText] = useState('');
@@ -15,11 +16,13 @@ export default function Home() {
       question: string;
       options: string[];
       answer: string;
+      correctAnswerExplanation: string;
     }[]
   >([]);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [quizGenerated, setQuizGenerated] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
@@ -36,6 +39,7 @@ export default function Home() {
     setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
     setScore(0);
     setQuizGenerated(true);
+    setShowFeedback(false);
   };
 
   const handleAnswerSelection = (questionIndex: number, answer: string) => {
@@ -52,11 +56,13 @@ export default function Home() {
       }
     });
     setScore(correctAnswers);
+    setShowFeedback(true);
   };
 
   const handleResetQuiz = () => {
     setUserAnswers(Array(quiz.length).fill(''));
     setScore(0);
+    setShowFeedback(false);
   };
 
   return (
@@ -116,6 +122,25 @@ export default function Home() {
                   ))}
                 </div>
               </CardContent>
+              {showFeedback && (
+                <CardFooter>
+                  {userAnswers[questionIndex] === question.answer ? (
+                    <div className="text-sm text-green-500">
+                      Correct! {question.correctAnswerExplanation}
+                    </div>
+                  ) : (
+                    userAnswers[questionIndex] ? (
+                      <div className="text-sm text-red-500">
+                        Incorrect. The correct answer is {question.answer}. {question.correctAnswerExplanation}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        No answer selected. The correct answer is {question.answer}. {question.correctAnswerExplanation}
+                      </div>
+                    )
+                  )}
+                </CardFooter>
+              )}
             </Card>
           ))}
 
@@ -128,7 +153,7 @@ export default function Home() {
             </Button>
           </div>
 
-          {score > 0 && (
+          {showFeedback && (
             <div className="mt-4 text-lg font-semibold">
               Your Score: {score} / {quiz.length}
             </div>
@@ -140,3 +165,12 @@ export default function Home() {
     </div>
   );
 }
+
+interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
+    ({ className, ...props }, ref) => (
+        <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
+    )
+)
+CardFooter.displayName = "CardFooter"
