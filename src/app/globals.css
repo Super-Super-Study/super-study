@@ -1,4 +1,4 @@
-@tailwind base;
+@@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -8,20 +8,20 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 204 70% 53%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+    --background: 255 100% 100%; /* White */
+    --foreground: 0 0% 0%; /* Black */
+    --card: 255 100% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 255 100% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 48 100% 48%; /* Super Bock Yellow */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 90%; /* Light Gray */
+    --secondary-foreground: 0 0% 0%; /* Black */
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 48 100% 75%; /* Light Yellow */
+    --accent-foreground: 0 0% 0%; /* Black */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
@@ -33,31 +33,31 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 0%; /*Black*/
+    --sidebar-foreground: 48 100% 48%; /*Super Bock Yellow*/
+    --sidebar-primary: 48 100% 48%; /* Super Bock Yellow */
+    --sidebar-primary-foreground: 0 0% 0%; /* Black */
+    --sidebar-accent: 48 100% 75%; /* Light Yellow */
+    --sidebar-accent-foreground: 0 0% 0%; /* Black */
+    --sidebar-border: 0 0% 20%; /* Slightly Lighter Dark Gray */
+    --sidebar-ring: 48 100% 48%; /* Super Bock Yellow */
     --success: 141 63% 48%;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 204 70% 53%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --background: 0 0% 0%; /* Black */
+    --foreground: 255 100% 100%; /* White */
+    --card: 0 0% 0%;
+    --card-foreground: 255 100% 100%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 255 100% 100%;
+     --primary: 48 100% 48%; /* Super Bock Yellow */
+    --primary-foreground: 0 0% 0%; /* Black */
+    --secondary: 0 0% 10%; /* Dark Gray/Black */
+    --secondary-foreground: 0 0% 100%; /* White */
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 48 100% 75%; /* Light Yellow */
+    --accent-foreground: 0 0% 0%; /* Black */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
@@ -68,14 +68,14 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 0%; /*Black*/
+    --sidebar-foreground: 48 100% 48%; /*Super Bock Yellow*/
+    --sidebar-primary: 48 100% 48%; /* Super Bock Yellow */
+    --sidebar-primary-foreground: 0 0% 0%; /* Black */
+    --sidebar-accent: 48 100% 75%; /* Light Yellow */
+    --sidebar-accent-foreground: 0 0% 0%; /* Black */
+    --sidebar-border: 0 0% 20%; /* Slightly Lighter Dark Gray */
+    --sidebar-ring: 48 100% 48%; /* Super Bock Yellow */
     --success: 141 63% 48%;
   }
 }
@@ -88,4 +88,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-

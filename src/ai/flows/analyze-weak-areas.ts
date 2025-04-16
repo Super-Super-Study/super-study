@@ -48,7 +48,7 @@ const analyzeWeakAreasPrompt = ai.definePrompt({
     }),
   },
   prompt: `You are an AI assistant that analyzes a student's quiz and open-ended question results to identify their weak areas and suggest areas for improvement.
-
+  
 Here is the original text used to generate the quiz:
 {{{text}}}
 
@@ -67,7 +67,7 @@ Here are the user's answers to the open-ended questions:
 Here are the grades for the open-ended questions:
 {{{openEndedGrades}}}
 
-Based on this information, provide a concise analysis of the student's weak areas and suggest specific topics they should focus on to improve their understanding.`,
+Based on this information, provide a concise analysis of the student's weak areas in a supportive and encouraging tone. Highlight specific topics they should focus on to improve their understanding, and offer actionable tips or study strategies. Frame your feedback as if you were a teacher providing guidance to a student.`,
 });
 
 const analyzeWeakAreasFlow = ai.defineFlow<
