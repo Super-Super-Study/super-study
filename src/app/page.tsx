@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
 import {generateQuiz} from '@/ai/flows/generate-quiz-from-text';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter} from '@/components/ui/card';
 import {Check, X} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {
@@ -14,6 +14,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import {gradeOpenEndedQuestion} from '@/ai/flows/grade-open-ended-question';
+import {generateOpenEndedQuestions} from '@/ai/flows/generate-open-ended-questions';
 
 type MultipleChoiceQuestion = {
   type: 'multipleChoice';
@@ -31,52 +32,18 @@ type OpenEndedQuestion = {
 
 type Question = MultipleChoiceQuestion | OpenEndedQuestion;
 
-const initialQuestions: Question[] = [
-  {
-    type: 'openEnded',
-    question: 'What are the key principles of responsive web design?',
-    idealAnswer:
-      'The key principles include fluid grids, flexible images, and media queries.',
-  },
-  {
-    type: 'openEnded',
-    question: 'Explain the concept of server-side rendering (SSR) in Next.js.',
-    idealAnswer:
-      'SSR involves rendering React components on the server and sending the HTML to the client, improving SEO and initial load time.',
-  },
-  {
-    type: 'openEnded',
-    question: 'Describe the advantages of using TypeScript in a Next.js project.',
-    idealAnswer:
-      'TypeScript provides static typing, improved code maintainability, and enhanced developer productivity.',
-  },
-  {
-    type: 'openEnded',
-    question: 'How does Next.js handle routing and navigation?',
-    idealAnswer:
-      'Next.js uses a file-system-based router for easy navigation and supports dynamic routes.',
-  },
-];
-
 export default function Home() {
   const [inputText, setInputText] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [quiz, setQuiz] = useState<MultipleChoiceQuestion[]>([]);
+  const [openEndedQuestions, setOpenEndedQuestions] = useState<OpenEndedQuestion[]>([]);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
-  const [openEndedAnswers, setOpenEndedAnswers] = useState<string[]>(
-    initialQuestions.map(() => '')
-  );
-  const [openEndedGrades, setOpenEndedGrades] = useState<number[]>(
-    initialQuestions.map(() => 0)
-  );
-  const [openEndedFeedback, setOpenEndedFeedback] = useState<string[]>(
-    initialQuestions.map(() => '')
-  );
+  const [openEndedAnswers, setOpenEndedAnswers] = useState<string[]>([]);
+  const [openEndedGrades, setOpenEndedGrades] = useState<number[]>([]);
+  const [openEndedFeedback, setOpenEndedFeedback] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [quizGenerated, setQuizGenerated] = useState(false);
+  const [openEndedQuestionsGenerated, setOpenEndedQuestionsGenerated] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [openEndedQuestionsGenerated, setOpenEndedQuestionsGenerated] =
-    useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
@@ -88,17 +55,28 @@ export default function Home() {
       return;
     }
 
-    const generatedQuiz = await generateQuiz({text: inputText});
-    setQuiz(
-      generatedQuiz.quiz.map(q => ({
+    try {
+      const generatedQuiz = await generateQuiz({text: inputText});
+      setQuiz(generatedQuiz.quiz.map(q => ({
         ...q,
         type: 'multipleChoice',
-      }))
-    );
-    setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
-    setScore(0);
-    setQuizGenerated(true);
-    setShowFeedback(false);
+      })));
+      setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
+
+      const generatedOpenEndedQuestions = await generateOpenEndedQuestions({text: inputText});
+      setOpenEndedQuestions(generatedOpenEndedQuestions.questions);
+      setOpenEndedAnswers(Array(generatedOpenEndedQuestions.questions.length).fill(''));
+      setOpenEndedGrades(Array(generatedOpenEndedQuestions.questions.length).fill(0));
+      setOpenEndedFeedback(Array(generatedOpenEndedQuestions.questions.length).fill(''));
+
+      setScore(0);
+      setQuizGenerated(true);
+      setOpenEndedQuestionsGenerated(false);
+      setShowFeedback(false);
+    } catch (error) {
+      console.error('Error generating quiz or open-ended questions:', error);
+      alert('Failed to generate quiz or open-ended questions. Please try again.');
+    }
   };
 
   const handleAnswerSelection = (questionIndex: number, answer: string) => {
@@ -124,38 +102,29 @@ export default function Home() {
     setShowFeedback(false);
   };
 
-  const handleOpenEndedAnswerChange = (
-    index: number,
-    answer: string
-  ): void => {
+  const handleOpenEndedAnswerChange = (index: number, answer: string): void => {
     const newAnswers = [...openEndedAnswers];
     newAnswers[index] = answer;
     setOpenEndedAnswers(newAnswers);
   };
 
-  const handleGradeOpenEndedQuestion = async () => {
+  const handleGradeOpenEndedQuestions = async () => {
     const grades = [];
     const feedbacks = [];
 
-    for (let i = 0; i < initialQuestions.length; i++) {
-      const question = initialQuestions[i];
-      if (question.type === 'openEnded') {
-        try {
-          const result = await gradeOpenEndedQuestion({
-            question: question.question,
-            answer: openEndedAnswers[i],
-            idealAnswer: question.idealAnswer,
-          });
-          grades.push(result.grade);
-          feedbacks.push(result.feedback);
-        } catch (error) {
-          console.error('Error grading open-ended question:', error);
-          grades.push(0);
-          feedbacks.push('Error grading question. Please try again.');
-        }
-      } else {
+    for (let i = 0; i < openEndedQuestions.length; i++) {
+      try {
+        const result = await gradeOpenEndedQuestion({
+          question: openEndedQuestions[i].question,
+          answer: openEndedAnswers[i],
+          idealAnswer: openEndedQuestions[i].idealAnswer,
+        });
+        grades.push(result.grade);
+        feedbacks.push(result.feedback);
+      } catch (error) {
+        console.error('Error grading open-ended question:', error);
         grades.push(0);
-        feedbacks.push('');
+        feedbacks.push('Error grading question. Please try again.');
       }
     }
 
@@ -167,7 +136,7 @@ export default function Home() {
   const calculateTotalScore = () => {
     let totalScore = score;
     openEndedGrades.forEach(grade => {
-      totalScore += grade / initialQuestions.length;
+      totalScore += grade / openEndedQuestions.length;
     });
     return totalScore;
   };
@@ -224,7 +193,7 @@ export default function Home() {
                         className="sr-only"
                       />
                       <span className="ml-2">{option}</span>
-                      {userAnswers[questionIndex] === option &&
+                      {showFeedback && userAnswers[questionIndex] === option &&
                         (question.answer === option ? (
                           <Check
                             className="ml-auto h-4 w-4 text-green-500"
@@ -286,44 +255,45 @@ export default function Home() {
         )
       )}
 
-      <h2 className="text-2xl font-bold mt-8 mb-4">Open-Ended Questions</h2>
-      {initialQuestions.map((question, index) => (
-        <Card key={index} className="mb-4 w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle>Open-Ended Question {index + 1}</CardTitle>
-            <CardDescription>{question.question}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              placeholder="Enter your answer here"
-              className="w-full mb-2"
-              value={openEndedAnswers[index]}
-              onChange={e => handleOpenEndedAnswerChange(index, e.target.value)}
-            />
-            {openEndedQuestionsGenerated && (
-              <div>
-                <p>Grade: {openEndedGrades[index]}</p>
-                <p>Feedback: {openEndedFeedback[index]}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
-      <Button onClick={handleGradeOpenEndedQuestion}>Grade Answers</Button>
-      {openEndedQuestionsGenerated && (
-        <div className="mt-4 text-lg font-semibold">
-          Total Score: {calculateTotalScore()}
+      {openEndedQuestions.length > 0 ? (
+        <div className="w-full max-w-2xl mt-8">
+          <h2 className="text-2xl font-bold mb-4">Open-Ended Questions</h2>
+          {openEndedQuestions.map((question, index) => (
+            <Card key={index} className="mb-4">
+              <CardHeader>
+                <CardTitle>Question {index + 1}</CardTitle>
+                <CardDescription>{question.question}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Enter your answer here"
+                  className="w-full mb-2"
+                  value={openEndedAnswers[index] || ''}
+                  onChange={e => {
+                    const newAnswers = [...openEndedAnswers];
+                    newAnswers[index] = e.target.value;
+                    setOpenEndedAnswers(newAnswers);
+                  }}
+                />
+                {openEndedQuestionsGenerated && (
+                  <div>
+                    <p>Grade: {openEndedGrades[index]}</p>
+                    <p>Feedback: {openEndedFeedback[index]}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+          <Button onClick={handleGradeOpenEndedQuestions}>Grade Answers</Button>
+          {openEndedQuestionsGenerated && (
+            <div className="mt-4 text-lg font-semibold">
+              Total Score: {calculateTotalScore()}
+            </div>
+          )}
         </div>
+      ) : quizGenerated && (
+        <p>No open-ended questions generated. Try a different input text.</p>
       )}
     </div>
   );
 }
-
-interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
-  ({className, ...props}, ref) => (
-    <div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />
-  )
-);
-CardFooter.displayName = 'CardFooter';
