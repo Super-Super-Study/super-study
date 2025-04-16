@@ -26,7 +26,7 @@ type MultipleChoiceQuestion = {
 };
 
 type OpenEndedQuestion = {
-  type: 'openEnded';
+  type: string;
   question: string;
   idealAnswer: string;
 };
@@ -54,39 +54,47 @@ export default function Home() {
   };
 
   const handleQuizGeneration = async () => {
-    if (!inputText) {
-      alert('Please enter text to generate a quiz.');
-      return;
-    }
+  if (!inputText) {
+    alert('Please enter text to generate a quiz.');
+    return;
+  }
 
-    try {
-      const generatedQuiz = await generateQuiz({text: inputText});
-      setQuiz(
-        generatedQuiz.quiz.map(q => ({
-          ...q,
-          type: 'multipleChoice',
-        }))
-      );
-      setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
+  try {
+    const generatedQuiz = await generateQuiz({text: inputText});
+    setQuiz(
+      generatedQuiz.quiz.map(q => ({
+        ...q,
+        type: 'multipleChoice',
+      }))
+    );
+    setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
 
-      const generatedOpenEndedQuestions = await generateOpenEndedQuestions({text: inputText});
-      setOpenEndedQuestions(generatedOpenEndedQuestions.questions);
-      setOpenEndedAnswers(Array(generatedOpenEndedQuestions.questions.length).fill(''));
-      setOpenEndedGrades(Array(generatedOpenEndedQuestions.questions.length).fill(0));
-      setOpenEndedFeedback(Array(generatedOpenEndedQuestions.questions.length).fill(''));
+    const generatedOpenEndedQuestions = await generateOpenEndedQuestions({text: inputText});
+    
+    // Transform the open-ended questions to include the 'type' property
+    const openEndedQuestionsWithType = generatedOpenEndedQuestions.questions.map(question => ({
+      ...question,
+      type: 'openEnded', // Adding the required 'type'
+    }));
 
-      setTotalQuizScore(0);
-      setTotalQuestionsScore(0);
-      setQuizGenerated(true);
-      setOpenEndedQuestionsGenerated(false);
-      setShowFeedback(false);
-      setTestEnded(false);
-      setWeakAreasAnalysis(null);
-    } catch (error) {
-      console.error('Error generating quiz or open-ended questions:', error);
-      alert('Failed to generate quiz or open-ended questions. Please try again.');
-    }
-  };
+    setOpenEndedQuestions(openEndedQuestionsWithType);
+    setOpenEndedAnswers(Array(generatedOpenEndedQuestions.questions.length).fill(''));
+    setOpenEndedGrades(Array(generatedOpenEndedQuestions.questions.length).fill(0));
+    setOpenEndedFeedback(Array(generatedOpenEndedQuestions.questions.length).fill(''));
+
+    setTotalQuizScore(0);
+    setTotalQuestionsScore(0);
+    setQuizGenerated(true);
+    setOpenEndedQuestionsGenerated(false);
+    setShowFeedback(false);
+    setTestEnded(false);
+    setWeakAreasAnalysis(null);
+  } catch (error) {
+    console.error('Error generating quiz or open-ended questions:', error);
+    alert('Failed to generate quiz or open-ended questions. Please try again.');
+  }
+};
+
 
   const handleAnswerSelection = (questionIndex: number, answer: string) => {
     const newUserAnswers = [...userAnswers];
@@ -180,18 +188,16 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-start min-h-screen py-10 bg-background"
     style={{ backgroundColor: '#EECC95'}}>
-      <img
-        src="/app/super-study-logo.png"
-        alt="Super Study Logo"
-        className="mb-4"
-        width={200}  // Adjust the width as needed
-        height={200} // Adjust the height as needed
-      />
+      <h1 className="mb-4" style={{ fontSize: '2rem', fontWeight: 'bold' }}>
+  Super Study
+</h1>
+
       <Textarea
         placeholder="Enter text to generate a quiz"
         className="w-full max-w-2xl mb-4"
         value={inputText}
         onChange={handleInputChange}
+        style = {{ backgroundColor: "#FFFFFF"}}
       />
       <Button
         onClick={handleQuizGeneration}
