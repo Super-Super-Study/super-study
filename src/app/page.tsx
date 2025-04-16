@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
 import {generateQuiz} from '@/ai/flows/generate-quiz-from-text';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter} from '@/components/ui/card';
 import {Check, X} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {
@@ -321,3 +321,4 @@ export default function Home() {
     </div>
   );
 }
+
