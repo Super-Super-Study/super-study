@@ -137,7 +137,6 @@ export default function Home() {
     }
 
     setOpenEndedGrades(grades);
-    setOpenEndedFeedback(feedbacks);
     setOpenEndedQuestionsGenerated(true);
   };
 
