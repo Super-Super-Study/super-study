@@ -63,7 +63,7 @@ export default function Home() {
         ...q,
         type: 'multipleChoice',
       })));
-      setUserAnswers(Array(generatedQuiz.quiz.length).fill(''),);
+      setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
 
       const generatedOpenEndedQuestions = await generateOpenEndedQuestions({text: inputText});
       setOpenEndedQuestions(generatedOpenEndedQuestions.questions);
@@ -97,6 +97,7 @@ export default function Home() {
       }
     });
     setTotalQuizScore(correctAnswers);
+    setShowFeedback(true);
   };
 
   const handleResetQuiz = () => {
