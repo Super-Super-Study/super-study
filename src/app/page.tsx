@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
 import {generateQuiz} from '@/ai/flows/generate-quiz-from-text';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader} from '@/components/ui/card';
 import {Check, X} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {
@@ -61,10 +61,12 @@ export default function Home() {
 
     try {
       const generatedQuiz = await generateQuiz({text: inputText});
-      setQuiz(generatedQuiz.quiz.map(q => ({
-        ...q,
-        type: 'multipleChoice',
-      })));
+      setQuiz(
+        generatedQuiz.quiz.map(q => ({
+          ...q,
+          type: 'multipleChoice',
+        }))
+      );
       setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
 
       const generatedOpenEndedQuestions = await generateOpenEndedQuestions({text: inputText});
@@ -176,8 +178,15 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen py-10 bg-secondary">
-      <h1 className="text-3xl font-bold mb-4">Quizify AI</h1>
+    <div className="flex flex-col items-center justify-start min-h-screen py-10 bg-background"
+    style={{ backgroundColor: '#EECC95'}}>
+      <img
+        src="https://i.ibb.co/9smGKTz/super-study-logo.png"
+        alt="Super Study Logo"
+        className="mb-4"
+        width={200}  // Adjust the width as needed
+        height={200} // Adjust the height as needed
+      />
       <Textarea
         placeholder="Enter text to generate a quiz"
         className="w-full max-w-2xl mb-4"
@@ -186,7 +195,7 @@ export default function Home() {
       />
       <Button
         onClick={handleQuizGeneration}
-        className="mb-4 bg-primary text-primary-foreground"
+        className="mb-4 bg-[#A21E1E] text-primary-foreground"
       >
         Generate Quiz
       </Button>
@@ -207,9 +216,8 @@ export default function Home() {
                       className={cn(
                         'flex items-center p-2 rounded-md border border-muted cursor-pointer hover:bg-accent',
                         userAnswers[questionIndex] === option
-                          ? 'bg-primary text-primary-foreground'
+                          ? 'bg-[#A21E1E] text-primary-foreground'
                           : ''
-                        
                       )}
                     >
                       <input
@@ -264,7 +272,7 @@ export default function Home() {
           <div className="flex justify-between">
             <Button
               onClick={handleSubmitQuiz}
-              className="bg-primary text-primary-foreground"
+              className="bg-[#A21E1E] text-primary-foreground"
             >
               Submit Quiz
             </Button>
