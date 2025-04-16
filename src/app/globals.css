@@ -14,7 +14,7 @@ body {
     --card-foreground: 0 0% 0%;
     --popover: 255 100% 100%;
     --popover-foreground: 0 0% 0%;
-    --primary: 48 100% 48%; /* Super Bock Yellow */
+    --primary: 0 67% 38%; /* Super Bock Yellow */
     --primary-foreground: 0 0% 100%; /* White */
     --secondary: 0 0% 90%; /* Light Gray */
     --secondary-foreground: 0 0% 0%; /* Black */
@@ -50,7 +50,7 @@ body {
     --card-foreground: 255 100% 100%;
     --popover: 0 0% 0%;
     --popover-foreground: 255 100% 100%;
-     --primary: 48 100% 48%; /* Super Bock Yellow */
+     --primary: 0 67% 38%; /* Super Bock Yellow */
     --primary-foreground: 0 0% 0%; /* Black */
     --secondary: 0 0% 10%; /* Dark Gray/Black */
     --secondary-foreground: 0 0% 100%; /* White */
