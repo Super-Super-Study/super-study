@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/accordion';
 import {gradeOpenEndedQuestion} from '@/ai/flows/grade-open-ended-question';
 import {generateOpenEndedQuestions} from '@/ai/flows/generate-open-ended-questions';
+import {analyzeWeakAreas} from '@/ai/flows/analyze-weak-areas';
 
 type MultipleChoiceQuestion = {
   type: 'multipleChoice';
@@ -46,6 +47,7 @@ export default function Home() {
   const [openEndedQuestionsGenerated, setOpenEndedQuestionsGenerated] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [testEnded, setTestEnded] = useState(false);
+  const [weakAreasAnalysis, setWeakAreasAnalysis] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
@@ -77,6 +79,7 @@ export default function Home() {
       setOpenEndedQuestionsGenerated(false);
       setShowFeedback(false);
       setTestEnded(false);
+      setWeakAreasAnalysis(null);
     } catch (error) {
       console.error('Error generating quiz or open-ended questions:', error);
       alert('Failed to generate quiz or open-ended questions. Please try again.');
@@ -106,6 +109,7 @@ export default function Home() {
     setTotalQuestionsScore(0);
     setShowFeedback(false);
     setTestEnded(false);
+    setWeakAreasAnalysis(null);
   };
 
   const handleOpenEndedAnswerChange = (index: number, answer: string): void => {
@@ -148,11 +152,27 @@ export default function Home() {
     setTotalQuestionsScore(grades.reduce((sum, grade) => sum + grade, 0));
   };
 
-  const handleEndTest = () => {
+  const handleEndTest = async () => {
     handleSubmitQuiz();
-    handleGradeOpenEndedQuestions();
+    await handleGradeOpenEndedQuestions();
     setShowFeedback(true);
     setTestEnded(true);
+
+    // Analyze weak areas
+    try {
+      const weakAreas = await analyzeWeakAreas({
+        text: inputText,
+        quiz: JSON.stringify(quiz),
+        userAnswers: JSON.stringify(userAnswers),
+        openEndedQuestions: JSON.stringify(openEndedQuestions),
+        openEndedAnswers: JSON.stringify(openEndedAnswers),
+        openEndedGrades: JSON.stringify(openEndedGrades),
+      });
+      setWeakAreasAnalysis(weakAreas.analysis);
+    } catch (error) {
+      console.error('Error analyzing weak areas:', error);
+      setWeakAreasAnalysis('Failed to analyze weak areas. Please try again.');
+    }
   };
 
   return (
@@ -314,6 +334,11 @@ export default function Home() {
       {testEnded && showFeedback && (
         <div className="mt-4 text-lg font-semibold">
           Total Score: {totalQuizScore + totalQuestionsScore} / {quiz.length + openEndedQuestions.length}
+          {weakAreasAnalysis && (
+            <div className="mt-2">
+              <strong>Weak Areas:</strong> {weakAreasAnalysis}
+            </div>
+          )}
         </div>
       )}
     </div>
