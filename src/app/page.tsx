@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
 import {generateQuiz} from '@/ai/flows/generate-quiz-from-text';
-import {Card, CardContent, CardDescription, CardHeader} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter} from '@/components/ui/card';
 import {Check, X} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {
@@ -181,7 +181,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-start min-h-screen py-10 bg-background"
     style={{ backgroundColor: '#EECC95'}}>
       <img
-        src="https://i.ibb.co/9smGKTz/super-study-logo.png"
+        src="/app/super-study-logo.png"
         alt="Super Study Logo"
         className="mb-4"
         width={200}  // Adjust the width as needed
