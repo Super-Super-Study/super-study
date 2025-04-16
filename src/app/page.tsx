@@ -113,18 +113,26 @@ export default function Home() {
     const feedbacks = [];
 
     for (let i = 0; i < openEndedQuestions.length; i++) {
-      try {
-        const result = await gradeOpenEndedQuestion({
-          question: openEndedQuestions[i].question,
-          answer: openEndedAnswers[i],
-          idealAnswer: openEndedQuestions[i].idealAnswer,
-        });
-        grades.push(result.grade);
-        feedbacks.push(result.feedback);
-      } catch (error) {
-        console.error('Error grading open-ended question:', error);
+      if (!openEndedAnswers[i]) {
         grades.push(0);
-        feedbacks.push('Error grading question. Please try again.');
+        feedbacks.push('No answer provided.');
+      } else {
+        try {
+          const result = await gradeOpenEndedQuestion({
+            question: openEndedQuestions[i].question,
+            answer: openEndedAnswers[i],
+            idealAnswer: openEndedQuestions[i].idealAnswer,
+          });
+
+          // Ensure the grade is between 0 and 1
+          const grade = Math.min(1, Math.max(0, result.grade));
+          grades.push(grade);
+          feedbacks.push(result.feedback);
+        } catch (error) {
+          console.error('Error grading open-ended question:', error);
+          grades.push(0);
+          feedbacks.push('Error grading question. Please try again.');
+        }
       }
     }
 
