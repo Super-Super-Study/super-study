@@ -289,7 +289,7 @@ export default function Home() {
                 />
                 {openEndedQuestionsGenerated && (
                   <div>
-                    <p>Grade: {openEndedGrades[index]}</p>
+                    <p>Grade: {openEndedGrades[index]} / 1</p>
                     <p>Feedback: {openEndedFeedback[index]}</p>
                   </div>
                 )}
@@ -307,9 +307,11 @@ export default function Home() {
         <p>No open-ended questions generated. Try a different input text.</p>
       )}
 
-      <Button onClick={handleEndTest} className="mt-4 bg-green-500 text-white">
-        End Test
-      </Button>
+      {quizGenerated && (
+        <Button onClick={handleEndTest} className="mt-4 bg-green-500 text-white">
+          End Test
+        </Button>
+      )}
 
       {testEnded && (
         <div className="mt-4 text-lg font-semibold">
@@ -319,4 +321,3 @@ export default function Home() {
     </div>
   );
 }
-
