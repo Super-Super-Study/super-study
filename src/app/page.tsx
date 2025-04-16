@@ -190,10 +190,8 @@ export default function Home() {
                         'flex items-center p-2 rounded-md border border-muted cursor-pointer hover:bg-accent',
                         userAnswers[questionIndex] === option
                           ? 'bg-primary text-primary-foreground'
-                          : '',
-                        userAnswers[questionIndex] === option &&
-                          question.answer !== option &&
-                          'line-through'
+                          : ''
+                        
                       )}
                     >
                       <input
