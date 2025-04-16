@@ -136,7 +136,7 @@ export default function Home() {
   const calculateTotalScore = () => {
     let totalScore = score;
     openEndedGrades.forEach(grade => {
-      totalScore += grade / openEndedQuestions.length;
+      totalScore += grade;
     });
     return totalScore;
   };
