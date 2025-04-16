@@ -5,7 +5,7 @@
  *
  * - gradeOpenEndedQuestion - A function that grades the provided answer.
  * - GradeOpenEndedQuestionInput - The input type for the gradeOpenEndedQuestion function.
- * - GradeOpenEndedQuestionOutput - The return type for the gradeOpenEndedQuestion function.
+ * - GradeOpenEndedQuestionOutput - The return type for the GradeOpenEndedQuestion function.
  */
 
 import {ai} from '@/ai/ai-instance';
@@ -19,7 +19,7 @@ const GradeOpenEndedQuestionInputSchema = z.object({
 export type GradeOpenEndedQuestionInput = z.infer<typeof GradeOpenEndedQuestionInputSchema>;
 
 const GradeOpenEndedQuestionOutputSchema = z.object({
-  grade: z.number().describe('The grade for the answer (0-100).'),
+  grade: z.number().min(0).max(1).describe('The grade for the answer (0-1).'),
   feedback: z.string().describe('Feedback on the answer.'),
 });
 export type GradeOpenEndedQuestionOutput = z.infer<typeof GradeOpenEndedQuestionOutputSchema>;
@@ -39,11 +39,11 @@ const gradeOpenEndedQuestionPrompt = ai.definePrompt({
   },
   output: {
     schema: z.object({
-      grade: z.number().describe('The grade for the answer (0-100).'),
+      grade: z.number().min(0).max(1).describe('The grade for the answer (0-1).'),
       feedback: z.string().describe('Feedback on the answer.'),
     }),
   },
-  prompt: `You are an expert grader. Grade the student's answer to the following question, compared to the ideal answer. Provide a grade from 0 to 100, and provide feedback on the answer. The grade should reflect how well the student's answer addresses the key points in the ideal answer.
+  prompt: `You are an expert grader. Grade the student's answer to the following question, compared to the ideal answer. Provide a grade from 0 to 1, and provide feedback on the answer. The grade should reflect how well the student's answer addresses the key points in the ideal answer.
 
 Question: {{{question}}}
 Student's Answer: {{{answer}}}
@@ -64,3 +64,4 @@ const gradeOpenEndedQuestionFlow = ai.defineFlow<
     return output!;
   }
 );
+
