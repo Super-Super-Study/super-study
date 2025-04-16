@@ -41,6 +41,7 @@ export default function Home() {
   const [openEndedGrades, setOpenEndedGrades] = useState<number[]>([]);
   const [openEndedFeedback, setOpenEndedFeedback] = useState<string[]>([]);
   const [totalQuizScore, setTotalQuizScore] = useState(0);
+  const [totalQuestionsScore, setTotalQuestionsScore] = useState(0);
   const [quizGenerated, setQuizGenerated] = useState(false);
   const [openEndedQuestionsGenerated, setOpenEndedQuestionsGenerated] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -62,7 +63,7 @@ export default function Home() {
         ...q,
         type: 'multipleChoice',
       })));
-      setUserAnswers(Array(generatedQuiz.quiz.length).fill(''));
+      setUserAnswers(Array(generatedQuiz.quiz.length).fill(''),);
 
       const generatedOpenEndedQuestions = await generateOpenEndedQuestions({text: inputText});
       setOpenEndedQuestions(generatedOpenEndedQuestions.questions);
@@ -71,6 +72,7 @@ export default function Home() {
       setOpenEndedFeedback(Array(generatedOpenEndedQuestions.questions.length).fill(''));
 
       setTotalQuizScore(0);
+      setTotalQuestionsScore(0);
       setQuizGenerated(true);
       setOpenEndedQuestionsGenerated(false);
       setShowFeedback(false);
@@ -95,12 +97,12 @@ export default function Home() {
       }
     });
     setTotalQuizScore(correctAnswers);
-    setShowFeedback(true);
   };
 
   const handleResetQuiz = () => {
     setUserAnswers(Array(quiz.length).fill(''));
     setTotalQuizScore(0);
+    setTotalQuestionsScore(0);
     setShowFeedback(false);
     setTestEnded(false);
   };
@@ -142,19 +144,13 @@ export default function Home() {
     setOpenEndedGrades(grades);
     setOpenEndedFeedback(feedbacks);
     setOpenEndedQuestionsGenerated(true);
-  };
-
-  const calculateTotalScore = () => {
-    let totalScore = totalQuizScore;
-    openEndedGrades.forEach(grade => {
-      totalScore += grade;
-    });
-    return totalScore;
+    setTotalQuestionsScore(grades.reduce((sum, grade) => sum + grade, 0));
   };
 
   const handleEndTest = () => {
     handleSubmitQuiz();
     handleGradeOpenEndedQuestions();
+    setShowFeedback(true);
     setTestEnded(true);
   };
 
@@ -258,7 +254,7 @@ export default function Home() {
 
           {showFeedback && (
             <div className="mt-4 text-lg font-semibold">
-              Your Score: {totalQuizScore} / {quiz.length}
+              Your Quiz Score: {totalQuizScore} / {quiz.length}
             </div>
           )}
         </div>
@@ -300,7 +296,7 @@ export default function Home() {
           <Button onClick={handleGradeOpenEndedQuestions}>Grade Answers</Button>
           {openEndedQuestionsGenerated && (
             <div className="mt-4 text-lg font-semibold">
-              Total Score: {calculateTotalScore()}
+              Total Questions Score: {totalQuestionsScore} / {openEndedQuestions.length}
             </div>
           )}
         </div>
@@ -314,9 +310,9 @@ export default function Home() {
         </Button>
       )}
 
-      {testEnded && (
+      {testEnded && showFeedback && (
         <div className="mt-4 text-lg font-semibold">
-          Total Score: {calculateTotalScore()} / {quiz.length + openEndedQuestions.length}
+          Total Score: {totalQuizScore + totalQuestionsScore} / {quiz.length + openEndedQuestions.length}
         </div>
       )}
     </div>
