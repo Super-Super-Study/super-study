@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Textarea} from '@/components/ui/textarea';
 import {generateQuiz} from '@/ai/flows/generate-quiz-from-text';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter} from '@/components/ui/card';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Check, X} from 'lucide-react';
 import {cn} from '@/lib/utils';
 import {
@@ -40,10 +40,11 @@ export default function Home() {
   const [openEndedAnswers, setOpenEndedAnswers] = useState<string[]>([]);
   const [openEndedGrades, setOpenEndedGrades] = useState<number[]>([]);
   const [openEndedFeedback, setOpenEndedFeedback] = useState<string[]>([]);
-  const [score, setScore] = useState(0);
+  const [totalQuizScore, setTotalQuizScore] = useState(0);
   const [quizGenerated, setQuizGenerated] = useState(false);
   const [openEndedQuestionsGenerated, setOpenEndedQuestionsGenerated] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [testEnded, setTestEnded] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(e.target.value);
@@ -69,10 +70,11 @@ export default function Home() {
       setOpenEndedGrades(Array(generatedOpenEndedQuestions.questions.length).fill(0));
       setOpenEndedFeedback(Array(generatedOpenEndedQuestions.questions.length).fill(''));
 
-      setScore(0);
+      setTotalQuizScore(0);
       setQuizGenerated(true);
       setOpenEndedQuestionsGenerated(false);
       setShowFeedback(false);
+      setTestEnded(false);
     } catch (error) {
       console.error('Error generating quiz or open-ended questions:', error);
       alert('Failed to generate quiz or open-ended questions. Please try again.');
@@ -92,14 +94,15 @@ export default function Home() {
         correctAnswers++;
       }
     });
-    setScore(correctAnswers);
+    setTotalQuizScore(correctAnswers);
     setShowFeedback(true);
   };
 
   const handleResetQuiz = () => {
     setUserAnswers(Array(quiz.length).fill(''));
-    setScore(0);
+    setTotalQuizScore(0);
     setShowFeedback(false);
+    setTestEnded(false);
   };
 
   const handleOpenEndedAnswerChange = (index: number, answer: string): void => {
@@ -141,11 +144,17 @@ export default function Home() {
   };
 
   const calculateTotalScore = () => {
-    let totalScore = score;
+    let totalScore = totalQuizScore;
     openEndedGrades.forEach(grade => {
       totalScore += grade;
     });
     return totalScore;
+  };
+
+  const handleEndTest = () => {
+    handleSubmitQuiz();
+    handleGradeOpenEndedQuestions();
+    setTestEnded(true);
   };
 
   return (
@@ -180,9 +189,7 @@ export default function Home() {
                       className={cn(
                         'flex items-center p-2 rounded-md border border-muted cursor-pointer hover:bg-accent',
                         userAnswers[questionIndex] === option
-                          ? question.answer === option
-                            ? 'bg-success text-card-foreground'
-                            : 'bg-primary text-primary-foreground'
+                          ? 'bg-primary text-primary-foreground'
                           : '',
                         userAnswers[questionIndex] === option &&
                           question.answer !== option &&
@@ -252,7 +259,7 @@ export default function Home() {
 
           {showFeedback && (
             <div className="mt-4 text-lg font-semibold">
-              Your Score: {score} / {quiz.length}
+              Your Score: {totalQuizScore} / {quiz.length}
             </div>
           )}
         </div>
@@ -300,6 +307,16 @@ export default function Home() {
         </div>
       ) : quizGenerated && (
         <p>No open-ended questions generated. Try a different input text.</p>
+      )}
+
+      <Button onClick={handleEndTest} className="mt-4 bg-green-500 text-white">
+        End Test
+      </Button>
+
+      {testEnded && (
+        <div className="mt-4 text-lg font-semibold">
+          Total Score: {calculateTotalScore()} / {quiz.length + openEndedQuestions.length}
+        </div>
       )}
     </div>
   );
